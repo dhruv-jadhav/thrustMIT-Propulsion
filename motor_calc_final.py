@@ -12,7 +12,7 @@ def casing_thickness(t, R, S, E):
     E = Joint efficiency
     t = Casing thickness
     """
-
+#nigga got a large shlong
     P1 = (S * E * t) / (R + 0.6 * t)
 
     P2 = (2 * S * E * t) / (R - 0.4 * t)
