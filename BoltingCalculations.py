@@ -99,4 +99,3 @@ def casing_bearing_stress(D_i_casing, MEOP, N, d_bolt_major, t, BYS):
     FS_bearing = BYS / bearing_stress
 
     return bearing_stress, FS_bearing
-

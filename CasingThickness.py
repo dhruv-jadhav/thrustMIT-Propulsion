@@ -16,17 +16,20 @@ def casing_thickness(t, R, S, E):
 
     pressure = min(P1, P2)
 
-    print(P1, P2, pressure)
-
     if pressure == P1:
         if pressure < 0.385 * S * E:
-            return pressure
+            MEOP = pressure / 1.5
+            return pressure, MEOP
         else:
             return "Equations Invalid"
     elif pressure == P2:
         if pressure * S * E:
-            return pressure
+            MEOP = pressure / 1.5
+            return pressure, MEOP
         else:
             return "Equations Invalid"
     else:
         return "Equations Invalid"
+
+#
+# print(casing_thickness(6, 50.93, 50.5, 1))
