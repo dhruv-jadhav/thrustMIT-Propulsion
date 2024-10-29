@@ -1,4 +1,4 @@
-
+import numpy as np
 # to find d4
 def dia_4(d4_base):
     Tg_d4 = 39 * 10 ** (-6)
@@ -52,7 +52,7 @@ def gland_compression(d2_base):
 # Gland Fill
 def gland_fill(d2, b):
     t_min, t_max = gland_depth()
-    oring_csa = math.pi * (d2 / 2) ** 2
+    oring_csa = np.pi * (d2 / 2) ** 2
     gland_csa_min = t_min * b
     gland_csa_max = t_max * b
     fill_percentage_min = (oring_csa / gland_csa_max) * 100
