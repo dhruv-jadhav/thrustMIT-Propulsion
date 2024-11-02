@@ -1,7 +1,7 @@
 import math
 # to find d4
 def dia_4(d4_base):
-    Tg_d4 = 54 * 10 ** (-3)
+    Tg_d4 = 54 * 0.01
     d4_lower = d4_base
     d4_upper = d4_base + Tg_d4
     return d4_lower, d4_upper
@@ -9,8 +9,8 @@ def dia_4(d4_base):
 
 # to find d9
 def dia_9(d9_base):
-    Tg_d9 = 35 * 10 ** (-3)
-    dev_d9 = -36 * 10 ** (-3)
+    Tg_d9 = 35 * 0.01
+    dev_d9 = -36 * 0.01
     d9_lower = d9_base - Tg_d9 + dev_d9
     d9_upper = d9_base + dev_d9
     return d9_lower, d9_upper
@@ -18,9 +18,9 @@ def dia_9(d9_base):
 
 # to find d3
 def dia_3(d3__base):
-    Tg_d3 = 87 * (10 ** (-3))
+    Tg_d3 = 86 * 0.01
     d3_lower = d3__base
-    d3_upper = d4_base + Tg_d3
+    d3_upper = d3__base + Tg_d3
     return d3_lower, d3_upper
 
 
@@ -60,27 +60,35 @@ def gland_fill(d2_lower,d2_upper, bo):
     fill_percentage_max = (oring_csa_upper/ gland_csa_min) * 100
     return fill_percentage_min, fill_percentage_max
 n=0
-d4_base = 95.86
-d9_base = 95.86
+d4_base =101.86
+d9_base = 101.86
 #d4_base = float(input("input value of d4 base"))
 #d9_base = float(input("input value of d9 base"))
-d3_base = [90.8,89.4,86.3]
-d1_base = [88.57,88.47,85]
-d2_base = [2.62,3.53,5.33]
-d2_error = [0.09,0.1,0.13,0.15]
-b = [3.6,4.8,7.2]
-b1 = [4.7,5.8,8.7]
+d3_base = [96.4]
+d1_base = [94.84]
+d2_base = [3.53]
+d2_error = [0.1]
+b = [4.8]
+b1 = [5.8]
 while n < len(d2_base):
     d2_lower=d2_base[n]-d2_error[n]
     d2_upper=d2_base[n]+d2_error[n]
-    d3__base=d3_base[n]
-    d1__base=d1_base[n]
-    bo = b[n]
+    d3__base=96.4
+    d1__base=94.84
+    bo = 4.8
+    t_min,t_max = gland_depth()
     stretch_min, stretch_max = oring_stretch(d1__base)
-    print(oring_stretch(d1__base))
     compression_min, compression_max = gland_compression(d2_lower,d2_upper)
     fill_percentage_min, fill_percentage_max = gland_fill(d2_lower,d2_upper, bo)
-    if stretch_max<6 and compression_min>11 and compression_max<23 and fill_percentage_min>60 and fill_percentage_max<90:
+    print("O-ring min strech is ",format(float(stretch_min)))
+    print("O-ring max strech is ",format(float(stretch_max)))
+    print("gland depth min is",format(float(t_min)))
+    print("gland depth max is",format(float(t_max)))
+    print("O-ring compression min is",format(float(compression_min)))
+    print("O-ring compression max is",format(float(compression_max)))
+    print("gland fill min is",format(float(fill_percentage_min)))
+    print("gland fill max is",format(float(fill_percentage_max)))
+    if stretch_max<6 and compression_min>10 and compression_max<24 and fill_percentage_min>59 and fill_percentage_max<91:
         print("O-ring min strech is")+print(oring_stretch(0))
         print("O-ring max strech is")+print(oring_stretch(1))
         print("gland depth min is")+print(gland_depth(0))
