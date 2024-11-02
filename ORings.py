@@ -1,7 +1,7 @@
 import math
 # to find d4
 def dia_4(d4_base):
-    Tg_d4 = 54 * 0.01
+    Tg_d4 = 54 * 0.001
     d4_lower = d4_base
     d4_upper = d4_base + Tg_d4
     return d4_lower, d4_upper
@@ -9,8 +9,8 @@ def dia_4(d4_base):
 
 # to find d9
 def dia_9(d9_base):
-    Tg_d9 = 35 * 0.01
-    dev_d9 = -36 * 0.01
+    Tg_d9 = 35 * 0.001
+    dev_d9 = -36 * 0.001
     d9_lower = d9_base - Tg_d9 + dev_d9
     d9_upper = d9_base + dev_d9
     return d9_lower, d9_upper
@@ -18,7 +18,7 @@ def dia_9(d9_base):
 
 # to find d3
 def dia_3(d3__base):
-    Tg_d3 = 86 * 0.01
+    Tg_d3 = 86 * 0.001
     d3_lower = d3__base
     d3_upper = d3__base + Tg_d3
     return d3_lower, d3_upper
