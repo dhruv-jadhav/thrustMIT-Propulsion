@@ -89,14 +89,7 @@ while n < len(d2_base):
     print("gland fill min is",format(float(fill_percentage_min)))
     print("gland fill max is",format(float(fill_percentage_max)))
     if stretch_max<6 and compression_min>10 and compression_max<24 and fill_percentage_min>59 and fill_percentage_max<91:
-        print("O-ring min strech is")+print(oring_stretch(0))
-        print("O-ring max strech is")+print(oring_stretch(1))
-        print("gland depth min is")+print(gland_depth(0))
-        print("gland depth max is")+print(gland_depth(1))
-        print("O-ring compression min is")+print(gland_compression(0))
-        print("O-ring compression max is")+print(gland_compression(0))
-        print("gland fill min is")+print(gland_fill(0))
-        print("gland fill max is")+print(gland_fill(1))
+        print("fits")
         break
     n=n+1
 
