@@ -1,5 +1,5 @@
 # Casing Thickness Formula
-def casing_thickness(t, R, S, E):
+def casing_thickness(t, R, S, E, FOS):
     """
     Calculates the minimum required thickness of the casing shell.
 
@@ -8,6 +8,7 @@ def casing_thickness(t, R, S, E):
     S = Maximum allowable stress
     E = Joint efficiency
     t = Casing thickness
+    FOS = Factor Of Safety for operating pressure
     """
 
     P1 = (S * E * t) / (R + 0.6 * t)
@@ -18,13 +19,13 @@ def casing_thickness(t, R, S, E):
 
     if pressure == P1:
         if pressure < 0.385 * S * E:
-            MEOP = pressure / 1.5
+            MEOP = pressure / FOS
             return pressure, MEOP
         else:
             return "Equations Invalid"
     elif pressure == P2:
         if pressure * S * E:
-            MEOP = pressure / 1.5
+            MEOP = pressure / FOS
             return pressure, MEOP
         else:
             return "Equations Invalid"

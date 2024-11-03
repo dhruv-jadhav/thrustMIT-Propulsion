@@ -22,17 +22,19 @@ casing_bys = 0
 bolt_dia_minor = 0
 bolt_dia_major = 0
 number_bolt = 0
-bolt_uts = 0
-edge_distance = 2 * bolt_dia_major
+bolt_shear_strength = 0
+edge_distance = 2.5 * bolt_dia_major
 
 # factors
 te = 0
 re = 0
 f = 0
-joint_efficiency = 1.00
-attachment_factor = 0.33
+pressure_fos = 0
+joint_efficiency = 0
+attachment_factor = 0
 # -----------------------------------------------------------------
-DesignPressure, MEOP = casing_thickness(thickness,casing_inside_radius, allowable_stress, joint_efficiency)
+
+DesignPressure, MEOP = casing_thickness(thickness,casing_inside_radius, allowable_stress, joint_efficiency, pressure_fos)
 
 print(f"The design pressure is: {DesignPressure} MPa")
 print(f"The maximum expected operating pressure is: {MEOP} MPa")
@@ -44,8 +46,8 @@ TearoutStress, FSTearout = bolt_tear_out(casing_inside_diameter, bolt_dia_major,
 print(f"\nThe bolt tearout stress is: {TearoutStress} MPa")
 print(f"The factor of safety is: {FSTearout}")
 
-BoltShear, FSShear = bolt_shear(casing_inside_diameter, bolt_dia_minor, MEOP, number_bolt, bolt_uts)
-print(f"\nThe bolt tearout stress is: {BoltShear} MPa")
+BoltShear, FSShear = bolt_shear(casing_inside_diameter, bolt_dia_minor, MEOP, number_bolt, bolt_shear_strength)
+print(f"\nThe bolt shear stress is: {BoltShear} MPa")
 print(f"The factor of safety is: {FSShear}")
 
 CasingTensile, FSTensile = casing_tensile_stress(casing_outside_diameter, thickness, number_bolt, bolt_dia_major, MEOP, casing_yts)

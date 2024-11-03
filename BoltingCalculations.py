@@ -3,7 +3,7 @@
 import math
 
 
-def bolt_shear(D_i_casing, d_bolt_minor, MEOP, N, UTS):
+def bolt_shear(D_i_casing, d_bolt_minor, MEOP, N, bolt_shear_strength):
     """
     Calculates the bolt shear stress and factor of safety.
 
@@ -22,7 +22,7 @@ def bolt_shear(D_i_casing, d_bolt_minor, MEOP, N, UTS):
     # Bolt shear stress
     bolt_shear_stress = numerator / denominator
 
-    FS_bolt_shear = (0.75 * UTS) / bolt_shear_stress
+    FS_bolt_shear = bolt_shear_strength / bolt_shear_stress
 
     return bolt_shear_stress, FS_bolt_shear
 
@@ -41,7 +41,7 @@ def bolt_tear_out(D_i_casing, d_bolt_major, MEOP, N, E, t, shear_strength):
     """
 
     # Calculate bolt force
-    F_bolt = (math.pi * D_i_casing ** 2 * MEOP) / (4 * N)
+    F_bolt = (math.pi * D_i_casing ** 2 * MEOP) / 4
 
     # Calculate E_min
     E_min = E - d_bolt_major / 2
@@ -51,7 +51,7 @@ def bolt_tear_out(D_i_casing, d_bolt_major, MEOP, N, E, t, shear_strength):
         raise ValueError("E_min must be at least twice d_bolt_major")
 
     # Calculate tear-out shear stress
-    tear_out_stress = F_bolt / (E_min * 2 * t)
+    tear_out_stress = F_bolt / (E_min * 2 * t * N)
 
     # Calculate factor of safety
     FS_tear_out = shear_strength / tear_out_stress
@@ -91,10 +91,10 @@ def casing_bearing_stress(D_i_casing, MEOP, N, d_bolt_major, t, BYS):
     MEOP: Maximum Expected Operating Pressure (MPa)
     BYS: Bearing Yield Strength of the casing material (MPa)
     """
-    F_bolt = (math.pi * D_i_casing ** 2 * MEOP) / (4 * N)
+    F_bolt = (math.pi * D_i_casing ** 2 * MEOP) / 4
 
     # Calculate bearing stress
-    bearing_stress = F_bolt / (d_bolt_major * t)
+    bearing_stress = F_bolt / (N * d_bolt_major * t)
 
     FS_bearing = BYS / bearing_stress
 
