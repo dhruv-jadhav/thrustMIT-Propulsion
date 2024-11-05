@@ -15,15 +15,15 @@ casing_outside_diameter = 114.2
 
 
 allowable_stress = 58.0
-casing_shear = 150.00
-casing_yts = 214.00
+casing_shear = 152.00
+casing_yts = 161
 casing_bys = 276.000
 
 # bolts
 bolt_dia_minor = 4.917
 bolt_dia_major = 6.00
-number_bolt = 8
-bolt_shear_strength = 730
+number_bolt = 6
+bolt_shear_strength = 780
 edge_distance = 2.5 * bolt_dia_major
 
 # factors
