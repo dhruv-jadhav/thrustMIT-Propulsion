@@ -173,7 +173,7 @@ def full_plots():
 
         h_value = heat_transfer_coefficient(C, cp, mu_value, dt, pr_value, m_dot_value, At, rc, A2, Tr_value, To, k, Ma1_value)
         h.append(h_value)
-        #print(h_value,'conv')
+        print(h_value,'conv')
 
     for i in y_throat:
 
