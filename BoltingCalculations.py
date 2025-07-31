@@ -99,18 +99,20 @@ def casing_bearing_stress(D_i_casing, MEOP, N, d_bolt_major, t, BYS):
     FS_bearing = BYS / bearing_stress
 
     return bearing_stress, FS_bearing
-def two_layer_bolt_shear(MEOP,d_i_case,N,d_1,d_2,t):
-    """
-    N is number of bolts 
-    d_i_case is dia of case
-    MEOP is  max operating pressure
-    As is shear area
-    d_1 is edge distance for bolts level 1
-    d_2 is edge distance for bolts level 2
-    """
-    As=(t*(d_1 + d_2))/2
-    T_shear= (MEOP*((d/2)**2)*math.pi)/(N*2*As)
 
-    return T_shear
 
-    
+def multiple_bolt_circle_tearout(D_i_casing, d_bolt_major, MEOP, E1, E2, t, shear_strength):
+    # Calculate bolt force
+    F_bolt = (math.pi * D_i_casing ** 2 * MEOP) / 4
+
+    E_min_1 = E1 - d_bolt_major / 2
+    E_min_2 = E2 - d_bolt_major / 2
+    avg_E_min = (E_min_1 + E_min_2) / 2
+
+    denom = avg_E_min * 2 * t
+
+    tearout_stress = F_bolt / denom
+
+    FOS = shear_strength / tearout_stress
+
+    return tearout_stress, FOS
