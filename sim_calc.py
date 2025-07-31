@@ -4,18 +4,18 @@ from scipy.optimize import fsolve
 from scipy.optimize import brentq
 import pandas as pd
 
-dt=25.5*10**-3
-dc=92.261*10**-3
-dd=77*10**-3
-Lc=47.672*10**-3
+dt=23*10**-3
+dc=90.120*10**-3
+dd=72.5*10**-3
+Lc=45.644*10**-3
 Lt=2*10**-3
-Ld=121.144*10**-3
+Ld=115.078*10**-3
 To=1600
-Po=4.98*10**6
-At=511*10**-6
+Po=6.1*10**6
+At=np.pi * (dt**2)/4
 k=1.042
 R=208.4
-cp = 69.41
+cp = 1682
 L_c= []
 c_star = 876
 Ma1 = []
@@ -31,19 +31,17 @@ g = 9.8
 rc = 2*dt
 def heat_transfer_coefficient(C, cp, mu, dt, pr, m_dot, At, rc, A2, Tr, To, k, Ma1):
     # Compute sigma
-    sigma = 1 / (((Tr / (2 * To)) * (1 + (k - 1) / 2 * Ma1**2) + 1/2) ** 0.65 * (1 + (k - 1) / 2 * Ma1**2) ** 0.15)
-    
-    # Compute heat transfer coefficient h
-    #h = (C * cp * mu**0.2 / (dt**0.2 * pr**0.6)) * \
-   #     ((m_dot / At) ** 0.8) * ((dt / rc) ** 0.1) * ((At / A2) ** 0.9) * sigma
-    term1 = C / (dt ** 0.2)
-    term2 = (mu ** 0.2 * cp) / (pr ** 0.6)
-    term3 = (Po * g) / c_star
-    term4 = (dt / rc) ** 0.1
-    term5 = (At / A2) ** 0.9
-
-    h = term1 * term2 * term3 * term4 * term5 * sigma
+    sigma = 1 / (
+        ((Tr / (2 * To)) * (1 + (k - 1) / 2 * Ma1**2) + 1/2) ** 0.65 * 
+        (1 + (k - 1) / 2 * Ma1**2) ** 0.15
+    )
+    term1 = C / (dt ** 0.2)                     # Diameter scaling
+    term2 = (mu ** 0.2 * cp) / (pr ** 0.4)      # Viscosity/heat capacity
+    term3 = (Po / c_star) ** 0.8                 # Pressure/velocity term
+    term4 = (dt / rc) ** 0.1                     # Curvature effect
+    h = term1 * term2 * term3 * term4 * sigma
     return h
+
 
 
 def temp_wall(To,Pr,k,Ma1):
@@ -86,21 +84,11 @@ def nozzle_profile_plot(dt,dc,Lc,Lt,Ld,dd):
 def solve_M(At,A2, k, M_guess):
     def mach_area_ratio(M_guess):
         return (1/M_guess**2) * ((2/(k+1)) * (1 + ((k-1)/2) * M_guess**2))**((k+1)/((k-1))) - (A2/At)**2
-    '''
-    M_solution = fsolve(mach_area_ratio, M_guess)
-    #print(np.abs(M_solution[0]))
-    '''
+
     if M_guess < 1:  # This case is for a converging section (subsonic)
         lower, upper = 0.00001, 0.999999  # Subsonic Mach number range
     else:  # This case is for a diverging section (supersonic)
         lower, upper = 1, 5.0  # Supersonic Mach number range
-
-    # Ensure the function changes sign in the interval
-    f_lower, f_upper = mach_area_ratio(lower), mach_area_ratio(upper)
-
-    if f_lower * f_upper > 0:
-        print(f"Warning: No sign change for A2 = {A2}, At = {At}. Using initial guess instead.")
-        return M_guess  # Handle this case, return the initial guess if no sign change is found
 
     # Use Brent's method to find the Mach number based on area ratio
     try:
@@ -126,7 +114,6 @@ def mass_flow_rate(Ma1,P2,T2,R,k,A2):
     term3 = Ma1 * (1 + (k - 1) / 2 * Ma1**2) ** (-(k + 1) / (2 * (k- 1)))
     return term1 * term2 * term3
 def full_plots():
-    A1=(np.pi*(dd)**2)/4
     Ma1_value=0
     x_converge = np.linspace(0, Lc, 100)
     y_converge = np.linspace(dc / 2, dt / 2, 100)
@@ -141,24 +128,17 @@ def full_plots():
     y_profile = np.concatenate([y_converge, y_throat, y_diverge])
 
     for i in y_converge:
-
         A2 = (np.pi * i**2) 
-        Ma1_value = Ma1_value+0.1
         Ma1_value = solve_M(At,A2, k, Ma1_value)
-        if Ma1_value is None:
-            print("Skipping this point due to missing solution.")
-            continue  # Skip to the next iteration
         Ma1.append(Ma1_value)
         #print(Ma1_value,"conv")
 
-        C = 0.023 if Ma1_value >= 1 else 0.026
+        C =0.026
 
         P2_value = pressure(Ma1_value, Po, k)
         P2.append(P2_value)
-
         T2_value = temperature(To, Ma1_value, k)
         T2.append(T2_value)
-
         m_dot_value = mass_flow_rate(Ma1_value, P2_value, T2_value, R, k, A2)
         m_dot.append(m_dot_value)
 
@@ -170,18 +150,21 @@ def full_plots():
 
         Tr_value = temp_wall(To, pr_value, k, Ma1_value)
         Tr.append(Tr_value)
-
+        #print(Tr_value,mu_value,Ma1_value,'conv')
         h_value = heat_transfer_coefficient(C, cp, mu_value, dt, pr_value, m_dot_value, At, rc, A2, Tr_value, To, k, Ma1_value)
         h.append(h_value)
-        print(h_value,'conv')
+        #print(h_value,i,'conv')
 
+        
+    j=0
     for i in y_throat:
 
         A2 = (np.pi * i**2) 
 
-        Ma1_value=1.0000001
+        Ma1_value=1
+        Ma1_value = solve_M(At,A2, k, Ma1_value)
         Ma1.append(Ma1_value)
-        C = 0.023 if Ma1_value >= 1 else 0.026
+        C =0.026
         #print(Ma1_value,"thrt")
         P2_value = pressure(Ma1_value, Po, k)
         P2.append(P2_value)
@@ -200,19 +183,20 @@ def full_plots():
 
         Tr_value = temp_wall(To, pr_value, k, Ma1_value)
         Tr.append(Tr_value)
-
+        #print(Tr_value,mu_value,Ma1_value,i,'thrt')
+        
         h_value = heat_transfer_coefficient(C, cp, mu_value, dt, pr_value, m_dot_value, At, rc, A2, Tr_value, To, k, Ma1_value)
         h.append(h_value)
-        #print(h_value,'thr')
+        #print(h_value,i,'thrt')
 
+    j=0
     for i in y_diverge:
-
         A2 = (np.pi * i**2) 
 
         Ma1_value=Ma1_value+0.016
         Ma1_value = solve_M(At,A2, k, Ma1_value)
         Ma1.append(Ma1_value)
-        C = 0.023 if Ma1_value >= 1 else 0.026
+        C =0.026
         #print(Ma1_value,"div")
         P2_value = pressure(Ma1_value, Po, k)
         P2.append(P2_value)
@@ -234,9 +218,8 @@ def full_plots():
 
         h_value = heat_transfer_coefficient(C, cp, mu_value, dt, pr_value, m_dot_value, At, rc, A2, Tr_value, To, k, Ma1_value)
         h.append(h_value)
-        #print(h_value,'div')
-    x_profile = np.concatenate([x_converge, x_throat, x_diverge])
-    # Create subplots
+        #print(h_value,i,'div')
+
     fig, plots = plt.subplots(2, 3, figsize=(9, 9))
     # Plot each dataset in appropriate subplot
     plots[0, 0].plot(x_profile, y_profile, label='upper nozzle')
