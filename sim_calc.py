@@ -4,74 +4,84 @@ from scipy.optimize import fsolve
 from scipy.optimize import brentq
 import pandas as pd
 
-dt=23*10**-3
-dc=90.120*10**-3
-dd=76*10**-3
-Lc=45.644*10**-3
-Lt=2*10**-3
-Ld=115.078*10**-3
-To=1600
-Po=5.689*10**6
-At=np.pi * (dt**2)/4
-k=1.042
-R=208.4
+dt = 23 * 10 ** -3
+dc = 90.120 * 10 ** -3
+dd = 76 * 10 ** -3
+Lc = 52.62 * 10 ** -3
+Lt = 2 * 10 ** -3
+Ld = 117.649 * 10 ** -3
+To = 1600
+Po = 5.79 * 10 ** 6
+At = np.pi * (dt ** 2) / 4
+k = 1.042
+R = 208.4
 cp = 1682
-L_c= []
+L_c = []
 c_star = 876
 Ma1 = []
 P2 = []
-T2= []
+T2 = []
 m_dot = []
 pr = []
 mu = []
-Tr= []
+Tr = []
 h = []
-x=0
+x = 0
 g = 9.8
-rc = 2*dt
+rc = 2 * dt
+
+
 def heat_transfer_coefficient(C, cp, mu, dt, pr, m_dot, At, rc, A2, Tr, To, k, Ma1):
-    sigma = 1 / (((Tr / (2 * To)) * (1 + (k - 1) / 2 * Ma1**2) + 1/2) ** 0.65 * (1 + (k - 1) / 2 * Ma1**2) ** 0.15)
+    sigma = 1 / (
+                ((Tr / (2 * To)) * (1 + (k - 1) / 2 * Ma1 ** 2) + 1 / 2) ** 0.65 * (1 + (k - 1) / 2 * Ma1 ** 2) ** 0.15)
     term1 = C / (dt ** 0.2)
     term2 = (mu ** 0.2 * cp) / (pr ** 0.6)
-    term3 = (Po / c_star)**0.8
+    term3 = (Po / c_star) ** 0.8
     term4 = (dt / rc) ** 0.1
     term5 = (At / A2) ** 0.9
-    print (sigma)
+    print(sigma)
     h = term1 * term2 * term3 * term4 * term5 * sigma
     return h
 
 
-
-def temp_wall(To,Pr,k,Ma1):
+def temp_wall(To, Pr, k, Ma1):
     # Compute recovery temperature Tr
-    Tr = To * (1 + (Pr ** (1/3)) * ((k - 1) / 2) * Ma1**2)
+    Tr = To * (1 + (Pr ** (1 / 3)) * ((k - 1) / 2) * Ma1 ** 2)
     return Tr
+
+
 def prandtl_number(k):
-    Pr = (4*k)/((9*k)-5)
+    Pr = (4 * k) / ((9 * k) - 5)
     return Pr
-def viscosity(Ma1,To):
-    mu = (5.84*(10**(-8)))*(Ma1**0.5)*(To**0.6)
+
+
+def viscosity(Ma1, To):
+    mu = (5.84 * (10 ** (-8))) * (Ma1 ** 0.5) * (To ** 0.6)
     return mu
 
-def nozzle_profile_plot(dt,dc,Lc,Lt,Ld,dd):
+
+def nozzle_profile_plot(dt, dc, Lc, Lt, Ld, dd):
     # Define key points for the profile
     x_converge = np.linspace(0, Lc, 100)
     y_converge = np.linspace(dc / 2, dt / 2, 100)
-    
+
     x_throat = np.array([Lc, Lc + Lt])
     y_throat = np.array([dt / 2, dt / 2])
-    
-    x_diverge = np.linspace(Lc + Lt, Lc + Lt + Ld, 125)
-    y_diverge = np.linspace(dt / 2, dd / 2, 125)
-    
+
+    x_diverge = np.linspace(Lc + Lt, Lc + Lt + Ld, 100)
+    y_diverge = np.linspace(dt / 2, dd / 2, 100)
+
     # Combine all sections
     x_profile = np.concatenate([x_converge, x_throat, x_diverge])
     y_profile = np.concatenate([y_converge, y_throat, y_diverge])
-    
-    return x_converge,x_throat,x_diverge,y_converge,y_throat,y_diverge,x_profile,y_profile
-def solve_M(At,A2, k, M_guess):
+
+    return x_converge, x_throat, x_diverge, y_converge, y_throat, y_diverge, x_profile, y_profile
+
+
+def solve_M(At, A2, k, M_guess):
     def mach_area_ratio(M_guess):
-        return (1/M_guess**2) * ((2/(k+1)) * (1 + ((k-1)/2) * M_guess**2))**((k+1)/((k-1))) - (A2/At)**2
+        return (1 / M_guess ** 2) * ((2 / (k + 1)) * (1 + ((k - 1) / 2) * M_guess ** 2)) ** ((k + 1) / ((k - 1))) - (
+                    A2 / At) ** 2
 
     if M_guess < 1:  # This case is for a converging section (subsonic)
         lower, upper = 0.00001, 0.999999  # Subsonic Mach number range
@@ -86,32 +96,39 @@ def solve_M(At,A2, k, M_guess):
         print(f"Error: No solution found for A2 = {A2}, At = {At}. Returning initial guess.")
         return M_guess  # Return the initial guess in case of failure
 
-    
-    #return np.abs(M_solution[0])
+    # return np.abs(M_solution[0])
 
-def pressure(Ma1,Po,k):
-    P_2 = Po * (1 + ((k - 1) / 2 )* Ma1**2) ** (-((k) / (k-1)))
+
+def pressure(Ma1, Po, k):
+    P_2 = Po * (1 + ((k - 1) / 2) * Ma1 ** 2) ** (-((k) / (k - 1)))
     return P_2
-def temperature(To, Ma1, k):
 
-    T_2 = To * (1 + ((k - 1) / 2) * Ma1**2)**(-1)
+
+def temperature(To, Ma1, k):
+    T_2 = To * (1 + ((k - 1) / 2) * Ma1 ** 2) ** (-1)
     return T_2
-def mass_flow_rate(Ma1,P2,T2,R,k,A2):
+
+
+def mass_flow_rate(Ma1, P2, T2, R, k, A2):
     term1 = (A2 * P2) / np.sqrt(T2)
     term2 = np.sqrt(k / R)
-    term3 = Ma1 * (1 + (k - 1) / 2 * Ma1**2) ** (-(k + 1) / (2 * (k- 1)))
+    term3 = Ma1 * (1 + (k - 1) / 2 * Ma1 ** 2) ** (-(k + 1) / (2 * (k - 1)))
     return term1 * term2 * term3
+
+
 def full_plots():
-    Ma1_value=0
-    x_converge,x_throat,x_diverge,y_converge,y_throat,y_diverge,x_profile,y_profile = nozzle_profile_plot(dt,dc,Lc,Lt,Ld,dd)
+    Ma1_value = 0
+    x_converge, x_throat, x_diverge, y_converge, y_throat, y_diverge, x_profile, y_profile = nozzle_profile_plot(dt, dc,
+                                                                                                                 Lc, Lt,
+                                                                                                                 Ld, dd)
 
     for i in y_converge:
-        A2 = (np.pi * i**2) 
-        Ma1_value = solve_M(At,A2, k, Ma1_value)
+        A2 = (np.pi * i ** 2)
+        Ma1_value = solve_M(At, A2, k, Ma1_value)
         Ma1.append(Ma1_value)
-        #print(Ma1_value,"conv")
+        # print(Ma1_value,"conv")
 
-        C =0.026
+        C = 0.026
 
         P2_value = pressure(Ma1_value, Po, k)
         P2.append(P2_value)
@@ -128,22 +145,21 @@ def full_plots():
 
         Tr_value = temp_wall(To, pr_value, k, Ma1_value)
         Tr.append(Tr_value)
-        #print(Tr_value,mu_value,Ma1_value,'conv')
-        h_value = heat_transfer_coefficient(C, cp, mu_value, dt, pr_value, m_dot_value, At, rc, A2, Tr_value, To, k, Ma1_value)
+        # print(Tr_value,mu_value,Ma1_value,'conv')
+        h_value = heat_transfer_coefficient(C, cp, mu_value, dt, pr_value, m_dot_value, At, rc, A2, Tr_value, To, k,
+                                            Ma1_value)
         h.append(h_value)
-        #print(h_value,i,'conv')
+        # print(h_value,i,'conv')
 
-        
-    j=0
+    j = 0
     for i in y_throat:
+        A2 = (np.pi * i ** 2)
 
-        A2 = (np.pi * i**2) 
-
-        Ma1_value=1
-        Ma1_value = solve_M(At,A2, k, Ma1_value)
+        Ma1_value = 1
+        Ma1_value = solve_M(At, A2, k, Ma1_value)
         Ma1.append(Ma1_value)
-        C =0.026
-        #print(Ma1_value,"thrt")
+        C = 0.026
+        # print(Ma1_value,"thrt")
         P2_value = pressure(Ma1_value, Po, k)
         P2.append(P2_value)
 
@@ -161,21 +177,22 @@ def full_plots():
 
         Tr_value = temp_wall(To, pr_value, k, Ma1_value)
         Tr.append(Tr_value)
-        #print(Tr_value,mu_value,Ma1_value,i,'thrt')
-        
-        h_value = heat_transfer_coefficient(C, cp, mu_value, dt, pr_value, m_dot_value, At, rc, A2, Tr_value, To, k, Ma1_value)
-        h.append(h_value)
-        #print(h_value,i,'thrt')
+        # print(Tr_value,mu_value,Ma1_value,i,'thrt')
 
-    j=0
+        h_value = heat_transfer_coefficient(C, cp, mu_value, dt, pr_value, m_dot_value, At, rc, A2, Tr_value, To, k,
+                                            Ma1_value)
+        h.append(h_value)
+        # print(h_value,i,'thrt')
+
+    j = 0
     for i in y_diverge:
-        A2 = (np.pi * i**2) 
+        A2 = (np.pi * i ** 2)
 
-        Ma1_value=Ma1_value+0.016
-        Ma1_value = solve_M(At,A2, k, Ma1_value)
+        Ma1_value = Ma1_value + 0.016
+        Ma1_value = solve_M(At, A2, k, Ma1_value)
         Ma1.append(Ma1_value)
-        C =0.026
-        #print(Ma1_value,"div")
+        C = 0.026
+        # print(Ma1_value,"div")
         P2_value = pressure(Ma1_value, Po, k)
         P2.append(P2_value)
 
@@ -194,9 +211,10 @@ def full_plots():
         Tr_value = temp_wall(To, pr_value, k, Ma1_value)
         Tr.append(Tr_value)
 
-        h_value = heat_transfer_coefficient(C, cp, mu_value, dt, pr_value, m_dot_value, At, rc, A2, Tr_value, To, k, Ma1_value)
+        h_value = heat_transfer_coefficient(C, cp, mu_value, dt, pr_value, m_dot_value, At, rc, A2, Tr_value, To, k,
+                                            Ma1_value)
         h.append(h_value)
-        #print(h_value,i,'div')
+        # print(h_value,i,'div')
 
     fig, plots = plt.subplots(2, 3, figsize=(9, 9))
     # Plot each dataset in appropriate subplot
@@ -218,10 +236,12 @@ def full_plots():
 
     # Show the figure
     plt.show()
-    return h,T2,P2,x_profile,y_profile
-#nozzle_profile_plot(dt,dc,Lc,Lt,Ld,dd)
-h,T2,P2,x_profile,y_profile = full_plots()
-nozzle_data = {'film coefficient':h,'temp':T2, 'pressure':P2,'x coordinate':x_profile,'y coordinates':y_profile}
+    return h, T2, P2, x_profile, y_profile
+
+
+# nozzle_profile_plot(dt,dc,Lc,Lt,Ld,dd)
+h, T2, P2, x_profile, y_profile = full_plots()
+nozzle_data = {'film coefficient': h, 'temp': T2, 'pressure': P2, 'x coordinate': x_profile, 'y coordinates': y_profile}
 motor_data = pd.DataFrame(nozzle_data)
 file_name = 'motor_sim_data_prac_1.xlsx'
 motor_data.to_excel(file_name)
