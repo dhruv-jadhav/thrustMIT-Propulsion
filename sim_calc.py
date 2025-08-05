@@ -33,10 +33,10 @@ def heat_transfer_coefficient(C, cp, mu, dt, pr, m_dot, At, rc, A2, Tr, To, k, M
     sigma = 1 / (((Tr / (2 * To)) * (1 + (k - 1) / 2 * Ma1**2) + 1/2) ** 0.65 * (1 + (k - 1) / 2 * Ma1**2) ** 0.15)
     term1 = C / (dt ** 0.2)
     term2 = (mu ** 0.2 * cp) / (pr ** 0.6)
-    term3 = (Po * g) / c_star
+    term3 = (Po / c_star)**0.8
     term4 = (dt / rc) ** 0.1
     term5 = (At / A2) ** 0.9
-
+    print (sigma)
     h = term1 * term2 * term3 * term4 * term5 * sigma
     return h
 
