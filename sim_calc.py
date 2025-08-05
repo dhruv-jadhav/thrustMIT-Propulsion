@@ -6,12 +6,12 @@ import pandas as pd
 
 dt=23*10**-3
 dc=90.120*10**-3
-dd=72.5*10**-3
+dd=76*10**-3
 Lc=45.644*10**-3
 Lt=2*10**-3
 Ld=115.078*10**-3
 To=1600
-Po=6.1*10**6
+Po=5.689*10**6
 At=np.pi * (dt**2)/4
 k=1.042
 R=208.4
@@ -30,16 +30,14 @@ x=0
 g = 9.8
 rc = 2*dt
 def heat_transfer_coefficient(C, cp, mu, dt, pr, m_dot, At, rc, A2, Tr, To, k, Ma1):
-    # Compute sigma
-    sigma = 1 / (
-        ((Tr / (2 * To)) * (1 + (k - 1) / 2 * Ma1**2) + 1/2) ** 0.65 * 
-        (1 + (k - 1) / 2 * Ma1**2) ** 0.15
-    )
-    term1 = C / (dt ** 0.2)                     # Diameter scaling
-    term2 = (mu ** 0.2 * cp) / (pr ** 0.4)      # Viscosity/heat capacity
-    term3 = (Po / c_star) ** 0.8                 # Pressure/velocity term
-    term4 = (dt / rc) ** 0.1                     # Curvature effect
-    h = term1 * term2 * term3 * term4 * sigma
+    sigma = 1 / (((Tr / (2 * To)) * (1 + (k - 1) / 2 * Ma1**2) + 1/2) ** 0.65 * (1 + (k - 1) / 2 * Ma1**2) ** 0.15)
+    term1 = C / (dt ** 0.2)
+    term2 = (mu ** 0.2 * cp) / (pr ** 0.6)
+    term3 = (Po * g) / c_star
+    term4 = (dt / rc) ** 0.1
+    term5 = (At / A2) ** 0.9
+
+    h = term1 * term2 * term3 * term4 * term5 * sigma
     return h
 
 
@@ -52,13 +50,13 @@ def prandtl_number(k):
     Pr = (4*k)/((9*k)-5)
     return Pr
 def viscosity(Ma1,To):
-    mu = (11.83*(10**(-8)))*(Ma1**0.5)*(To**0.6)
+    mu = (5.84*(10**(-8)))*(Ma1**0.5)*(To**0.6)
     return mu
 
 def nozzle_profile_plot(dt,dc,Lc,Lt,Ld,dd):
     # Define key points for the profile
-    x_converge = np.linspace(0, Lc, 59)
-    y_converge = np.linspace(dc / 2, dt / 2, 59)
+    x_converge = np.linspace(0, Lc, 100)
+    y_converge = np.linspace(dc / 2, dt / 2, 100)
     
     x_throat = np.array([Lc, Lc + Lt])
     y_throat = np.array([dt / 2, dt / 2])
@@ -70,17 +68,7 @@ def nozzle_profile_plot(dt,dc,Lc,Lt,Ld,dd):
     x_profile = np.concatenate([x_converge, x_throat, x_diverge])
     y_profile = np.concatenate([y_converge, y_throat, y_diverge])
     
-    # Plot the nozzle profile
-    plt.figure(figsize=(8, 4))
-    plt.plot(x_profile, y_profile, label='Nozzle Upper Profile')
-    plt.plot(x_profile, -y_profile, label='Nozzle Lower Profile')
-    plt.xlabel('Length (m)')
-    plt.ylabel('Radius (m)')
-    plt.legend()
-    plt.title('Nozzle Profile')
-    plt.axis('equal')
-    plt.grid()
-    plt.show()
+    return x_converge,x_throat,x_diverge,y_converge,y_throat,y_diverge,x_profile,y_profile
 def solve_M(At,A2, k, M_guess):
     def mach_area_ratio(M_guess):
         return (1/M_guess**2) * ((2/(k+1)) * (1 + ((k-1)/2) * M_guess**2))**((k+1)/((k-1))) - (A2/At)**2
@@ -115,17 +103,7 @@ def mass_flow_rate(Ma1,P2,T2,R,k,A2):
     return term1 * term2 * term3
 def full_plots():
     Ma1_value=0
-    x_converge = np.linspace(0, Lc, 100)
-    y_converge = np.linspace(dc / 2, dt / 2, 100)
-    
-    x_throat = np.array([Lc, Lc + Lt])
-    y_throat = np.array([dt / 2, dt / 2])
-    
-    x_diverge = np.linspace(Lc + Lt, Lc + Lt + Ld, 100)
-    y_diverge = np.linspace(dt / 2, dd / 2, 100)
-
-    x_profile = np.concatenate([x_converge, x_throat, x_diverge])
-    y_profile = np.concatenate([y_converge, y_throat, y_diverge])
+    x_converge,x_throat,x_diverge,y_converge,y_throat,y_diverge,x_profile,y_profile = nozzle_profile_plot(dt,dc,Lc,Lt,Ld,dd)
 
     for i in y_converge:
         A2 = (np.pi * i**2) 
@@ -228,6 +206,7 @@ def full_plots():
     plots[1, 2].plot(x_profile, P2, label='pressure')
     plots[0, 1].plot(x_profile, T2, label='temp')
     plots[0, 2].plot(x_profile, Ma1, label='mach number')
+    plots[1, 0].plot(x_profile, Tr, label='wall temp')
 
     # Add labels to all plots
     for ax in plots.flat:
