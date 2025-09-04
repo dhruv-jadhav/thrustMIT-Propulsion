@@ -4,18 +4,18 @@ from scipy.optimize import fsolve
 from scipy.optimize import brentq
 import pandas as pd
 
-dt = 23 * 10 ** -3
-dc = 90.120 * 10 ** -3
-dd = 76 * 10 ** -3
-Lc = 52.62 * 10 ** -3
+dt = 25.5 * 10 ** -3
+dc = 83.6 * 10 ** -3
+dd = 74 * 10 ** -3
+Lc = 50.647 * 10 ** -3
 Lt = 2 * 10 ** -3
-Ld = 117.649 * 10 ** -3
+Ld = 93.695 * 10 ** -3
 To = 1600
-Po = 5.79 * 10 ** 6
+Po = 4.61 * 10 ** 6
 At = np.pi * (dt ** 2) / 4
 k = 1.042
 R = 208.4
-cp = 1682
+cp = 1740
 L_c = []
 c_star = 876
 Ma1 = []
@@ -244,5 +244,5 @@ h, T2, P2, x_profile, y_profile = full_plots()
 nozzle_data = {'film coefficient': h, 'temp': T2, 'pressure': P2, 'x coordinate': x_profile, 'y coordinates': y_profile}
 motor_data = pd.DataFrame(nozzle_data)
 file_name = 'motor_sim_data_prac_1.xlsx'
-motor_data.to_excel(file_name)
+motor_data.to_excel(excel_writer='C:/Users/Dhruv Jadhav/Documents/College/thrustMIT/IREC 2026/HTCs/FilmCoefficient.xlsx')
 # Plot the results

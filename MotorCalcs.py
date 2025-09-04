@@ -13,16 +13,16 @@ casing_outside_diameter = 101.4
 casing_inside_diameter = casing_outside_diameter - 2 * thickness
 casing_inside_radius = casing_inside_diameter / 2
 
-allowable_stress = 82
-casing_shear = 210
-casing_yts = 270
-casing_bys = 386
+allowable_stress = 57.4
+casing_shear = 152
+casing_yts = 214
+casing_bys = 276
 
 # bolts
 bolt_dia_minor = 4.917
 bolt_dia_major = 6
 number_bolt = 12
-bolt_shear_strength = 730
+bolt_shear_strength = 620
 edge_distance = 2 * bolt_dia_major
 
 # Multiple Bolt Circles
