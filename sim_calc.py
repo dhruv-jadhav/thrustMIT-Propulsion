@@ -39,14 +39,14 @@ def heat_transfer_coefficient(C, cp, mu, dt, pr, m_dot, At, rc, A2, Tr, To, k, M
     term3 = (Po / c_star) ** 0.8
     term4 = (dt / rc) ** 0.1
     term5 = (At / A2) ** 0.9
-    print(sigma)
     h = term1 * term2 * term3 * term4 * term5 * sigma
+    print(h)
     return h
 
 
-def temp_wall(To, Pr, k, Ma1):
+def temp_wall(T2, Pr, k, Ma1):
     # Compute recovery temperature Tr
-    Tr = To * (1 + (Pr ** (1 / 3)) * ((k - 1) / 2) * Ma1 ** 2)
+    Tr = T2 * (1 +( Pr**(1/3))*(k-1)/2*Ma1**2) / (1 + (k-1)/2*Ma1**2)
     return Tr
 
 
@@ -143,7 +143,7 @@ def full_plots():
         mu_value = viscosity(Ma1_value, To)
         mu.append(mu_value)
 
-        Tr_value = temp_wall(To, pr_value, k, Ma1_value)
+        Tr_value = temp_wall(T2_value, pr_value, k, Ma1_value)
         Tr.append(Tr_value)
         # print(Tr_value,mu_value,Ma1_value,'conv')
         h_value = heat_transfer_coefficient(C, cp, mu_value, dt, pr_value, m_dot_value, At, rc, A2, Tr_value, To, k,
@@ -175,7 +175,7 @@ def full_plots():
         mu_value = viscosity(Ma1_value, To)
         mu.append(mu_value)
 
-        Tr_value = temp_wall(To, pr_value, k, Ma1_value)
+        Tr_value = temp_wall(T2_value, pr_value, k, Ma1_value)
         Tr.append(Tr_value)
         # print(Tr_value,mu_value,Ma1_value,i,'thrt')
 
@@ -208,7 +208,7 @@ def full_plots():
         mu_value = viscosity(Ma1_value, To)
         mu.append(mu_value)
 
-        Tr_value = temp_wall(To, pr_value, k, Ma1_value)
+        Tr_value = temp_wall(T2_value, pr_value, k, Ma1_value)
         Tr.append(Tr_value)
 
         h_value = heat_transfer_coefficient(C, cp, mu_value, dt, pr_value, m_dot_value, At, rc, A2, Tr_value, To, k,
